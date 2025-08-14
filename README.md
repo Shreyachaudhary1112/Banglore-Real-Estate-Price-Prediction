@@ -1,53 +1,68 @@
-Bengaluru Real Estate Price Prediction
-Overview
-This project builds an end to end price prediction application for residential properties in Bengaluru. It trains a regression model on a cleaned Kaggle housing dataset, serves predictions through a Python Flask API, and provides a simple web page where users can enter square footage, BHK, bathrooms, and location to get an instant estimate.
+# Bengaluru Real Estate Price Prediction
 
-Dataset
-I used the Bengaluru House Price dataset from Kaggle. It includes features such as area_type, availability, location, size, total_sqft, bath, balcony, and price. The raw data contains many unique neighborhoods and several messy entries, for example inconsistent location names, non numeric values in total_sqft, and missing values in fields like society and balcony. The target variable is the sale price.
+A simple end-to-end app that estimates prices for residential properties in Bengaluru. It trains a regression model on a cleaned Kaggle housing dataset, serves predictions through a Python Flask API, and includes a minimal web page where users enter square footage, BHK, bathrooms, and location to get an instant estimate.
 
-Data Cleaning and Preparation
-Standardized location strings and trimmed whitespace
+---
 
-Parsed total_sqft to numeric values, handling ranges and non-standard formats
+## Overview
 
-Derived BHK from the size field when needed
+This project walks from raw data to a usable prediction tool:
+- Clean and prepare the Bengaluru housing dataset
+- Train and validate a regression model with scikit-learn
+- Save model artifacts for reliable inference
+- Serve predictions via a lightweight Flask API
+- Call the API from a small HTML, CSS, and JavaScript front end
 
-Built price_per_sqft to help understand neighborhood level variation
+---
 
-Removed unusable records after careful inspection of missing fields
+## Dataset
 
-Outlier Detection and Removal
-Outliers vary by neighborhood, so a single global cutoff is not ideal. I removed extreme values using price_per_sqft within each location, and filtered entries with unrealistic room to area ratios, for example tiny homes claiming high BHK counts. This step improved validation stability and reduced variance.
+**Source:** Bengaluru House Price dataset on Kaggle  
+**Features:** `area_type`, `availability`, `location`, `size`, `total_sqft`, `bath`, `balcony`, `price`  
+The raw data includes many unique neighborhoods and some messy entries, such as inconsistent location names, non numeric values in `total_sqft`, and missing values in fields like `society` and `balcony`.  
+**Target:** `price` (sale price)
 
-Feature Engineering
-Kept numeric features: total_sqft, bath, bhk
+---
 
-One hot encoded location to capture neighborhood effects
+## Data Cleaning and Preparation
 
-Grouped very rare locations into an other bucket to control dimensionality without losing signal
+- Standardized location strings and trimmed whitespace
+- Parsed `total_sqft` to numeric values, handling ranges and non standard formats
+- Derived `BHK` from the `size` field when needed
+- Computed `price_per_sqft` to capture neighborhood level variation
+- Removed unusable records after inspecting missing fields
 
-Modeling Approach
-I started with scikit learn LinearRegression as a strong, interpretable baseline. I also evaluated regularized models such as Ridge and Lasso. Hyperparameters were tuned using GridSearchCV. The final choice balanced bias and variance and kept the pipeline simple to serve.
+---
 
-Training and Validation
-Split the dataset into train and test sets
+## Outlier Detection and Removal
 
-Used K Fold cross validation to estimate generalization error
+Outliers vary by neighborhood, so a single global cutoff is not ideal. I filtered out extreme values using `price_per_sqft` within each location, and dropped entries with unrealistic room to area ratios, such as tiny homes claiming very high BHK counts. This improved validation stability and reduced variance.
 
-Monitored metrics such as R² and RMSE on the validation folds and on the held out test set
+---
 
-Saved model artifacts after training, including the fitted estimator and the exact feature column order, to guarantee that inference uses the same preprocessing as training
+## Feature Engineering
 
-How Predictions Are Served
-A lightweight Flask service loads the saved model and column metadata once at startup. The API accepts user inputs for location, square footage, BHK, and bathrooms, transforms them into the feature vector used during training, and returns a predicted price. The UI is a minimal HTML, CSS, and JavaScript page that calls this API and displays the estimate.
+- Kept numeric features: `total_sqft`, `bath`, `bhk`
+- One hot encoded `location` to capture neighborhood effects
+- Grouped very rare locations into an `other` bucket to control dimensionality without losing signal
 
-What to Expect from the Model
-Predictions are estimates based on historical data and engineered features. They reflect typical market patterns at the neighborhood level rather than exact quotes for any specific property. The goal is to provide a fast, transparent baseline that is easy to understand and extend.
+---
 
-Possible Extensions
-Compare additional models such as Random Forest or Gradient Boosting
+## Modeling Approach
 
-Add richer geospatial features or external signals like proximity to transit or schools
+I started with `LinearRegression` from scikit-learn as an interpretable baseline, then evaluated regularized models such as `Ridge` and `Lasso`. Hyperparameters were tuned with `GridSearchCV`. The final choice balances bias and variance while keeping the pipeline simple to serve.
 
-Track experiments and model versions, and add simple monitoring for prediction drift
+---
 
+## Training and Validation
+
+- Split the dataset into train and test sets
+- Used K-Fold cross validation to estimate generalization error
+- Monitored `R²` and `RMSE` on validation folds and on the held out test set
+- Saved model artifacts after training, including the fitted estimator and the exact feature column order, to ensure inference uses the same preprocessing as training
+
+---
+
+## How Predictions Are Served
+
+A lightweight Flask service loads the saved model and column metadata once at startup. The API accepts `location`, `total_sqft`, `bhk`, and `bath`, transforms them into the training feature vector, and returns a predicted price. The UI is a small HTML, CSS, and JavaScript page that calls this API and displays the estimate.
