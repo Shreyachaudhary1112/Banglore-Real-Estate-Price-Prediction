@@ -73,6 +73,6 @@ A lightweight Flask app loads the saved model at startup, constructs the feature
 
 **Key endpoints**
 
-- `GET /get_location_names` returns the list of locations used by the model, which the UI uses to populate the dropdown. :contentReference[oaicite:2]{index=2}  
-- `POST /predict_home_price` accepts `total_sqft`, `bhk`, `bath`, and `location`, then returns `{ "estimated_price": <number> }`. The client posts form data to this path and renders the result in the UI. :contentReference[oaicite:3]{index=3}
+- `GET /get_location_names` returns the list of locations used by the model, which the UI uses to populate the dropdown.  
+- `POST /predict_home_price` accepts `total_sqft`, `bhk`, `bath`, and `location`, then returns `{ "estimated_price": <number> }`. The client posts form data to this path and renders the result in the UI. 
 
